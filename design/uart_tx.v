@@ -19,6 +19,8 @@ module uart_tx #(
 //input of fsm
 reg [$clog2(OVERSAMPLE)-1:0] oversample_counter;
 reg [$clog2(DATA_WIDTH)-1:0] tx_bit_counter;
+//data in reg
+reg [DATA_WIDTH-1:0] data_in_reg;
 //state of fsm
 reg [1:0] state, next_state;
 //next for counter
@@ -34,11 +36,13 @@ always @(posedge clk or negedge rst_n) begin
         tx_bit_counter <= 0;
         next_oversample_counter <= 0;
         next_tx_bit_counter <= 0;
+        data_in_reg <= 0;
     end
     else begin
         state <= next_state;
         oversample_counter <= next_oversample_counter;
         tx_bit_counter <= next_tx_bit_counter;
+        data_in_reg <= data_in;
     end
 end
 //always comb for next state logic
@@ -128,7 +132,7 @@ always @(*) begin
             tx_busy = 1'b1;
         end
         DATA: begin
-            tx = data_in[tx_bit_counter];
+            tx = data_in_reg[tx_bit_counter];
             tx_ready = 1'b0;
             tx_busy = 1'b1;
         end
